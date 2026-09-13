@@ -1,0 +1,40 @@
+1. Billing & Finance
+
+Subject: Requesting a refund for an incorrect invoice
+
+Hello,
+My monthly bill is higher than what was stated on the pricing page. It looks like I was charged twice for my subscription, and my receipt has the wrong amount.
+Could you please process a refund for the unauthorized transaction and update my credit card on file? I also need the correct invoice for my accounting department.
+Thanks.
+
+2. Technical Support
+
+Subject: Application keeps crashing and 500 server error
+
+Hi Support,
+The application crashes every time I click the export to PDF button. 
+Whenever I try to upload a photo, the app freezes completely and memory usage spikes to 100%.
+I am also getting a 500 internal server error on the main dashboard. 
+Are the servers down? Please let me know how to fix this bug.
+
+3. Account Access
+
+
+Subject: Locked out and 2FA SMS code not arriving
+
+Hello,
+I forgot my password and the reset link is not arriving in my inbox. 
+My account has been temporarily locked out after too many login attempts.
+Furthermore, I am not receiving the OTP SMS to verify my mobile number for two-factor authentication. 
+Please help me bypass the 2FA so I can get back in, or let me know if my account is marked as suspended.
+
+4. Hardware & Logistics
+
+Subject: Tracking says delivered but package is missing parts
+
+Hi team,
+
+My tracking number shows delivered, but I haven't received the parcel. 
+On my previous order, the package was delivered damaged with broken parts inside, and I was sent the wrong color.
+I need to return the defective unit.
+ Can you please provide a prepaid return shipping label and send a replacement power adapter to my new shipping address?

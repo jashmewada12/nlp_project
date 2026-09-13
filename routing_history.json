@@ -1,0 +1,50 @@
+[
+    {
+        "sender": "Jash Mewada <jashmewada8@gmail.com>",
+        "subject": "Locked out and 2FA SMS code not arriving",
+        "category": "Account",
+        "destination": "accounts@yourdomain.com"
+    },
+    {
+        "sender": "Jash Mewada <jashmewada8@gmail.com>",
+        "subject": "Application keeps crashing and 500 server error",
+        "category": "Technical",
+        "destination": "mewadajash94@student.sfit.ac.in"
+    },
+    {
+        "sender": "Jash Mewada <jashmewada8@gmail.com>",
+        "subject": "Issue with my recent invoice and duplicate charge",
+        "category": "Billing",
+        "destination": "shravanmore777@gmail.com"
+    },
+    {
+        "sender": "Jash Mewada <jashmewada8@gmail.com>",
+        "subject": "wrong receipt",
+        "category": "Logistics",
+        "destination": "logistics@yourdomain.com"
+    },
+    {
+        "sender": "Jash Mewada <jashmewada8@gmail.com>",
+        "subject": "did not receive the receipt",
+        "category": "Billing",
+        "destination": "dswanand14a@gmail.com"
+    },
+    {
+        "sender": "Jash Mewada <jashmewada8@gmail.com>",
+        "subject": "not working",
+        "category": "Logistics",
+        "destination": "logistics@yourdomain.com"
+    },
+    {
+        "sender": "Jash Mewada <jashmewada8@gmail.com>",
+        "subject": "receipt",
+        "category": "Billing",
+        "destination": "dswanand14a@gmail.com"
+    },
+    {
+        "sender": "Jash Mewada <jashmewada8@gmail.com>",
+        "subject": "Meeting on 27 th june",
+        "category": "Logistics",
+        "destination": "logistics@yourdomain.com"
+    }
+]

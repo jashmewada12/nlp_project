@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated NLP Router Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0c10; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    </style>
+</head>
+<body class="bg-[#0b0c10] text-gray-200 min-h-screen flex flex-col">
+
+    <header class="bg-[#151b23] text-white px-6 py-3 shadow-md flex items-center justify-between border-b border-gray-800">
+        <div class="flex items-center gap-3">
+            <svg class="w-6 h-6 text-[#f2c811]" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
+            <h1 class="text-lg font-semibold tracking-wide">Automated NLP Ticket Router Analytics</h1>
+        </div>
+        <div class="text-sm text-gray-400">Live Production Environment</div>
+    </header>
+
+    <main class="flex-grow p-6 max-w-7xl mx-auto w-full">
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-[#1f2833] p-4 border-t-4 border-[#118DFF] rounded shadow-sm border border-gray-800 border-t-[#118DFF]">
+                <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Total Tickets Routed</p>
+                <p class="text-3xl font-bold mt-1 text-white" id="kpi-total">0</p>
+            </div>
+            <div class="bg-[#1f2833] p-4 border-t-4 border-[#4f60f6] rounded shadow-sm border border-gray-800 border-t-[#4f60f6]">
+                <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Highest Volume Dept</p>
+                <p class="text-xl font-bold mt-2 text-white truncate" id="kpi-top-dept">-</p>
+            </div>
+            <div class="bg-[#1f2833] p-4 border-t-4 border-[#E66C37] rounded shadow-sm border border-gray-800 border-t-[#E66C37]">
+                <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Latest Ticket Subject</p>
+                <p class="text-sm font-semibold mt-2 text-white truncate" id="kpi-latest-subject">-</p>
+            </div>
+            <div class="bg-[#1f2833] p-4 border-t-4 border-[#00B01A] rounded shadow-sm border border-gray-800 border-t-[#00B01A]">
+                <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">System Status</p>
+                <p class="text-xl font-bold mt-2 text-[#00B01A] flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#00B01A] animate-pulse shadow-[0_0_8px_#00B01A]"></span> Online
+                </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-[#1f2833] rounded shadow-sm border border-gray-800 flex flex-col h-[450px]">
+                <div class="px-5 py-4 border-b border-gray-800">
+                    <h2 class="text-md font-semibold text-gray-200">Routing Distribution</h2>
+                </div>
+                <div class="p-5 flex-grow relative flex items-center justify-center">
+                    <div class="relative h-full w-full max-h-[300px]">
+                        <canvas id="routingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-[#1f2833] rounded shadow-sm border border-gray-800 lg:col-span-2 flex flex-col h-[450px]">
+                <div class="px-5 py-4 border-b border-gray-800 flex justify-between items-center">
+                    <h2 class="text-md font-semibold text-gray-200">Detailed Routing Log</h2>
+                    <button onclick="fetchDashboardData()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 rounded border border-gray-600 transition">
+                        Refresh Data
+                    </button>
+                </div>
+                <div class="p-0 flex-grow overflow-auto">
+                    <table class="min-w-full text-left text-sm whitespace-nowrap">
+                        <thead class="bg-[#151b23] sticky top-0 border-b border-gray-700 z-10">
+                            <tr>
+                                <th class="px-5 py-3 font-semibold text-gray-400">Department</th>
+                                <th class="px-5 py-3 font-semibold text-gray-400">Sender</th>
+                                <th class="px-5 py-3 font-semibold text-gray-400">Subject</th>
+                                <th class="px-5 py-3 font-semibold text-gray-400">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body" class="divide-y divide-gray-800">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let routingChartInstance = null;
+
+        // Set global Chart.js text color to match dark theme
+        Chart.defaults.color = '#9ca3af';
+
+        const colorPalette = {
+            "Technical": "#118DFF",
+            "Billing": "#4f60f6",
+            "Account": "#E66C37",
+            "Logistics": "#9b51e0",
+            "Default": "#00B01A"
+        };
+
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch('/api/history');
+                const tickets = await response.json();
+
+                if (tickets.length === 0) return;
+
+                document.getElementById('kpi-total').innerText = tickets.length;
+                document.getElementById('kpi-latest-subject').innerText = tickets[0].subject;
+
+                let categoryCounts = { "Technical": 0, "Billing": 0, "Account": 0, "Logistics": 0 };
+                
+                const tableBody = document.getElementById('table-body');
+                tableBody.innerHTML = ''; 
+                
+                tickets.forEach(ticket => {
+                    const cat = ticket.category;
+                    if(categoryCounts[cat] !== undefined) categoryCounts[cat]++;
+                    
+                    const color = colorPalette[cat] || colorPalette["Default"];
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-[#2c3540] transition-colors";
+                    tr.innerHTML = `
+                        <td class="px-5 py-3 border-l-4" style="border-left-color: ${color}">
+                            <span class="font-semibold text-gray-200">${cat}</span>
+                        </td>
+                        <td class="px-5 py-3 text-gray-400">${ticket.sender}</td>
+                        <td class="px-5 py-3 text-gray-400 truncate max-w-[200px]" title="${ticket.subject}">${ticket.subject}</td>
+                        <td class="px-5 py-3">
+                            <span class="text-xs text-[#00B01A] bg-[#00B01A]/10 px-2 py-1 rounded font-medium border border-[#00B01A]/20">Routed</span>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+                let topDept = Object.keys(categoryCounts).reduce((a, b) => categoryCounts[a] > categoryCounts[b] ? a : b);
+                document.getElementById('kpi-top-dept').innerText = topDept + " (" + categoryCounts[topDept] + ")";
+
+                const chartData = Object.values(categoryCounts);
+                const chartLabels = Object.keys(categoryCounts);
+                const chartColors = chartLabels.map(label => colorPalette[label]);
+
+                const ctx = document.getElementById('routingChart').getContext('2d');
+                
+                if (routingChartInstance) {
+                    routingChartInstance.destroy();
+                }
+
+                routingChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: chartColors,
+                            borderColor: '#1f2833', 
+                            borderWidth: 2,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: { usePointStyle: true, boxWidth: 8, font: { family: 'Segoe UI' } }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(11, 12, 16, 0.9)',
+                                borderColor: '#374151',
+                                borderWidth: 1,
+                                padding: 12,
+                                titleFont: { family: 'Segoe UI', size: 13 },
+                                bodyFont: { family: 'Segoe UI', size: 13 },
+                                titleColor: '#ffffff',
+                                bodyColor: '#d1d5db'
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+
+        fetchDashboardData();
+    </script>
+</body>
+</html>
