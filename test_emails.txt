@@ -11,11 +11,7 @@ Thanks.
 
 Subject: Application keeps crashing and 500 server error
 
-Hi Support,
-The application crashes every time I click the export to PDF button. 
-Whenever I try to upload a photo, the app freezes completely and memory usage spikes to 100%.
-I am also getting a 500 internal server error on the main dashboard. 
-Are the servers down? Please let me know how to fix this bug.
+
 
 3. Account Access
 

@@ -1,46 +1,125 @@
-import re
 import math
+import re
 from collections import Counter
 
-# ==========================================
-# 1. PREPROCESSING PIPELINE
-# ==========================================
+# Pre processing pipeline
 STOPWORDS = {
-    "i", "me", "my", "myself", "we", "our", "ours", "you", "your", "he", "she", 
-    "it", "they", "the", "a", "an", "is", "was", "are", "were", "be", "have", 
-    "has", "had", "do", "does", "did", "to", "from", "in", "on", "at", "by", 
-    "for", "with", "about", "against", "into", "through", "during", "before", 
-    "after", "above", "below", "up", "down", "in", "out", "off", "over", "under", 
-    "again", "further", "then", "once", "here", "there", "when", "where", "why", 
-    "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", 
-    "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", 
-    "can", "will", "just", "don", "should", "now", "this", "but", "and"
+    "i",
+    "me",
+    "my",
+    "myself",
+    "we",
+    "our",
+    "ours",
+    "you",
+    "your",
+    "he",
+    "she",
+    "it",
+    "they",
+    "the",
+    "a",
+    "an",
+    "is",
+    "was",
+    "are",
+    "were",
+    "be",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "to",
+    "from",
+    "in",
+    "on",
+    "at",
+    "by",
+    "for",
+    "with",
+    "about",
+    "against",
+    "into",
+    "through",
+    "during",
+    "before",
+    "after",
+    "above",
+    "below",
+    "up",
+    "down",
+    "out",
+    "off",
+    "over",
+    "under",
+    "again",
+    "further",
+    "then",
+    "once",
+    "here",
+    "there",
+    "when",
+    "where",
+    "why",
+    "how",
+    "all",
+    "any",
+    "both",
+    "each",
+    "few",
+    "more",
+    "most",
+    "other",
+    "some",
+    "such",
+    "no",
+    "nor",
+    "not",
+    "only",
+    "own",
+    "same",
+    "so",
+    "than",
+    "too",
+    "very",
+    "can",
+    "will",
+    "just",
+    "don",
+    "should",
+    "now",
+    "this",
+    "but",
+    "and",
 }
+
 
 def clean_and_tokenize(text):
     text = text.lower()
-    text = re.sub(r'[^a-z\s]', ' ', text)
+    text = re.sub(r"[^a-z\s]", " ", text)
     return text.split()
 
+
 def simple_stemmer(word):
-    suffixes = ('ing', 'ly', 'ed', 'ious', 'ies', 'es', 's', 'ment')
+    suffixes = ("ing", "ly", "ed", "ious", "ies", "es", "s", "ment")
     for suffix in suffixes:
         if word.endswith(suffix) and len(word) - len(suffix) > 2:
-            return word[:-len(suffix)]
+            return word[: -len(suffix)]
     return word
+
 
 def preprocess_text(text):
     tokens = clean_and_tokenize(text)
     return [simple_stemmer(w) for w in tokens if w not in STOPWORDS and len(w) > 1]
 
 
-# ==========================================
-# 2. SCRATCH TF-IDF VECTORIZER
-# ==========================================
+# tf-idf vectorizer
 class ScratchTfidfVectorizer:
     def __init__(self):
-        self.vocab = {}          
-        self.idf = {}            
+        self.vocab = {}
+        self.idf = {}
         self.doc_count = 0
 
     def fit(self, tokenized_docs):
@@ -81,7 +160,7 @@ class ScratchTfidfVectorizer:
                     vec[index] = tf * self.idf[token]
 
             # L2 Normalization (Scale vector to have a length of 1)
-            norm = math.sqrt(sum(val ** 2 for val in vec))
+            norm = math.sqrt(sum(val**2 for val in vec))
             if norm > 0:
                 vec = [val / norm for val in vec]
 
@@ -93,21 +172,19 @@ class ScratchTfidfVectorizer:
         return self.transform(tokenized_docs)
 
 
-# ==========================================
-# 3. SCRATCH NAIVE BAYES CLASSIFIER
-# ==========================================
+# Naive bayes classifier
 class ScratchMultinomialNB:
     def __init__(self, alpha=1.0):
         self.alpha = alpha  # Laplace Smoothing parameter
         self.classes = []
         self.class_priors = {}
-        self.feature_log_probs = {} 
+        self.feature_log_probs = {}
 
     def fit(self, X, y):
         self.classes = list(set(y))
         total_docs = len(y)
         num_features = len(X[0])
-        
+
         # Calculate Class Priors P(c)
         class_counts = Counter(y)
         for c in self.classes:
@@ -131,7 +208,7 @@ class ScratchMultinomialNB:
             self.feature_log_probs[c] = log_probs
 
     def predict_single(self, vector):
-        best_score = -float('inf')
+        best_score = -float("inf")
         best_class = None
 
         # Calculate Score(c) = log P(c) + sum(log P(w|c) * weight)

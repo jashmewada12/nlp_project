@@ -1,6 +1,12 @@
 [
     {
         "sender": "Jash Mewada <jashmewada8@gmail.com>",
+        "subject": "Application keeps crashing and 500 server error",
+        "category": "Technical",
+        "destination": "shravanmore777@student.sfit.ac.in"
+    },
+    {
+        "sender": "Jash Mewada <jashmewada8@gmail.com>",
         "subject": "Locked out and 2FA SMS code not arriving",
         "category": "Account",
         "destination": "accounts@yourdomain.com"

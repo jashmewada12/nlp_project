@@ -1,24 +1,24 @@
 import pickle
-import __main__
 from typing import TypedDict
-from langgraph.graph import StateGraph, END
 
-# Import your custom classes from your modular file
-from nlp_core import preprocess_text, ScratchTfidfVectorizer, ScratchMultinomialNB
+from langgraph.graph import END, StateGraph
+
+import __main__
 from gmail_api import authenticate_gmail, send_routed_email
+from nlp_core import ScratchMultinomialNB, ScratchTfidfVectorizer, preprocess_text
 
-# THE PICKLE FIX
 __main__.ScratchTfidfVectorizer = ScratchTfidfVectorizer
 __main__.ScratchMultinomialNB = ScratchMultinomialNB
 
-# Load models using the correct path to your models/ folder
-with open('models/custom_tfidf_vectorizer.pkl', 'rb') as f:
+
+with open("models/custom_tfidf_vectorizer.pkl", "rb") as f:
     vectorizer = pickle.load(f)
-with open('models/custom_naive_bayes_model.pkl', 'rb') as f:
+with open("models/custom_naive_bayes_model.pkl", "rb") as f:
     model = pickle.load(f)
 
 # Authenticate Gmail
 gmail_service = authenticate_gmail()
+
 
 # LangGraph State and Routing Logic
 class TicketState(TypedDict):
@@ -29,12 +29,14 @@ class TicketState(TypedDict):
     destination_email: str
     status: str
 
+
 DEPARTMENT_MAP = {
-    "Technical": "tech-support@yourdomain.com",
-    "Billing": "billing@yourdomain.com",
-    "Account": "accounts@yourdomain.com",
-    "Logistics": "logistics@yourdomain.com"
+    "Technical": "shravanmore777@student.sfit.ac.in",
+    "Billing": "manavlakhani96@student.sfit.ac.in",
+    "Account": "dswanand14@student.sfit.ac.in",
+    "Logistics": "mewadajash94@student.sfit.ac.in",
 }
+
 
 def classify_ticket(state: TicketState):
     tokens = preprocess_text(state["body"])
@@ -42,18 +44,24 @@ def classify_ticket(state: TicketState):
     prediction = model.predict(vec)[0]
     return {"predicted_category": prediction}
 
+
 def map_department(state: TicketState):
     category = state.get("predicted_category", "Technical")
     return {"destination_email": DEPARTMENT_MAP.get(category, "general@yourdomain.com")}
 
+
 def dispatch_email(state: TicketState):
     success = send_routed_email(
-        gmail_service, state["destination_email"], state["subject"], 
-        state["original_sender"], state["body"], state["predicted_category"]
+        gmail_service,
+        state["destination_email"],
+        state["subject"],
+        state["original_sender"],
+        state["body"],
+        state["predicted_category"],
     )
     return {"status": "Dispatched" if success else "Failed"}
 
-# Build and Compile the Graph
+
 workflow = StateGraph(TicketState)
 workflow.add_node("classifier", classify_ticket)
 workflow.add_node("mapper", map_department)
@@ -64,5 +72,5 @@ workflow.add_edge("classifier", "mapper")
 workflow.add_edge("mapper", "dispatcher")
 workflow.add_edge("dispatcher", END)
 
-# This is the variable that app.py is looking for!
+
 router_app = workflow.compile()
